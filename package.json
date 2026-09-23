@@ -1,0 +1,29 @@
+{
+  "name": "monitor-demandas",
+  "version": "1.0.0",
+  "description": "Monitor de demandas pessoal (widget Windows + Android)",
+  "author": "Lukas Goes Seal",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist:win": "electron-builder --win nsis --publish never"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.5.2",
+    "@capacitor/core": "8.5.2",
+    "@capacitor/local-notifications": "8.3.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.5.2",
+    "electron": "44.4.5",
+    "electron-builder": "26.15.3"
+  },
+  "build": {
+    "appId": "br.lukas.monitordemandas",
+    "productName": "Monitor de Demandas",
+    "files": ["main.js", "preload.js", "www/**/*", "build/icon.png", "!node_modules/@capacitor/**"],
+    "directories": { "output": "dist" },
+    "win": { "target": "nsis", "icon": "build/icon.png" },
+    "nsis": { "oneClick": true, "perMachine": false }
+  }
+}
