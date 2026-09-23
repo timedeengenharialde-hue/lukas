@@ -11,6 +11,12 @@ jobs:
       ELECTRON_SKIP_BINARY_DOWNLOAD: 1
     steps:
       - uses: actions/checkout@v4
+      - name: Localizar projeto
+        shell: bash
+        run: |
+          f=$(find . -name package.json -not -path "*/node_modules/*" | head -1)
+          if [ -z "$f" ]; then echo "::error::package.json não encontrado. Suba os arquivos do zip no repositório."; exit 1; fi
+          echo "PROJ=$(dirname "$f")" >> "$GITHUB_ENV"
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -19,24 +25,36 @@ jobs:
           distribution: temurin
           java-version: 21
       - run: npm install --no-audit --no-fund
+        working-directory: ${{ env.PROJ }}
       - run: npx cap add android
+        working-directory: ${{ env.PROJ }}
       - run: npx cap sync android
+        working-directory: ${{ env.PROJ }}
       - run: chmod +x android/gradlew && cd android && ./gradlew assembleDebug
+        working-directory: ${{ env.PROJ }}
       - uses: actions/upload-artifact@v4
         with:
           name: monitor-android-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          path: ${{ env.PROJ }}/android/app/build/outputs/apk/debug/app-debug.apk
 
   windows:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Localizar projeto
+        shell: bash
+        run: |
+          f=$(find . -name package.json -not -path "*/node_modules/*" | head -1)
+          if [ -z "$f" ]; then echo "::error::package.json não encontrado. Suba os arquivos do zip no repositório."; exit 1; fi
+          echo "PROJ=$(dirname "$f")" >> "$GITHUB_ENV"
       - uses: actions/setup-node@v4
         with:
           node-version: 22
       - run: npm install --no-audit --no-fund
+        working-directory: ${{ env.PROJ }}
       - run: npm run dist:win
+        working-directory: ${{ env.PROJ }}
       - uses: actions/upload-artifact@v4
         with:
           name: monitor-windows-instalador
-          path: dist/*.exe
+          path: ${{ env.PROJ }}/dist/*.exe
